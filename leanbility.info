@@ -1,0 +1,5 @@
+; $Id$
+name = Leanbility
+description = Enables SMS Leanbility integration in Ding!.
+package = Ding!
+core = 6.x

@@ -1,0 +1,64 @@
+<?php
+// $Id$
+
+// Index variables
+define('LEANBILITY_SUB', 'subscribed');
+define('LEANBILITY_SUB_TYPE', 'type');
+
+/**
+ * Implementation of hook_perm().
+ */
+function leanbility_perm() {
+  return array(
+     'configure leanbility',
+    );
+ }
+
+/**
+ * Implementation of hook_menu().
+ */
+function leanbility_menu() {
+  $items = array();
+
+  $items['admin/settings/leanbility'] = array(
+    'title' => 'Leanbility',
+    'description' => t('Configuration of leanbility service.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('leanbility_admin_form'),
+    'access arguments' => array('configure leanbility'),
+    'file' => 'leanbility.admin.inc',
+  );
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_flush_caches().
+ */
+function leanbility_flush_caches() {
+	return array('cache_leanbility');
+}
+
+/**
+ * Request the leanbility service for the status for the user.
+ *
+ * @param string $borr_card
+ * @return string
+ */
+function leanbility_status($borr_card) {
+  module_load_include('inc', 'leanbility', 'includes/service');
+  $service = new LeanbilityServerProvider($borr_card);
+  return $service->status();
+}
+
+/**
+ * Changes the leanbility status of the user with $borr_card no
+ *
+ * @param int $borr_card
+ * @param string $type
+ */
+function leanbility_update($borr_card, $type) {
+  module_load_include('inc', 'leanbility', 'includes/service');
+  $service = new LeanbilityServerProvider($borr_card);
+  $service->update($type);
+}
