@@ -1,5 +1,7 @@
 <?php
 
+// $Id$
+
 /**
  * Implementation of hook_install().
  */
@@ -30,3 +32,4 @@ function leanbility_schema() {
 	$schema['cache_leanbility'] = drupal_get_schema_unprocessed('system', 'cache');
 	return $schema;
 }
+

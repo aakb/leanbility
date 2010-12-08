@@ -62,3 +62,40 @@ function leanbility_update($borr_card, $type) {
   $service = new LeanbilityServerProvider($borr_card);
   $service->update($type);
 }
+
+function leanbility_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'alma_user_user_library_settings_form') {
+
+    global $user;
+    $creds = ding_library_user_get_credentials($user);
+
+    $defaults = variable_get('leanbility', array());
+    $defaults['service_types'] = array_filter($defaults['service_types']);
+    $defaults['choices'] = array();
+    foreach ($defaults['service_types'] as $key => $value) { // Maybe use array_map
+      $defaults['choices'][$key] = t(ucfirst($key));
+    }
+    $form['leanbility'] = array(
+      '#type' => 'radios',
+      '#title' => t('Leanbility choices'),
+      '#options' => $defaults['choices'],
+      '#description' => t('How would you like to receive information about the leanbility of your reservations.'),
+      '#attributes' => array('class' => 'leanbility'),
+      '#default_value' => leanbility_status($creds['user_id']),
+    );
+
+    $form['#submit'][] = 'leanbility_alma_settings_form_validate';
+  }
+}
+
+
+function leanbility_alma_settings_form_validate($form, &$form_state) {
+
+  $creds = ding_library_user_get_credentials($form_state['values']['account']);
+
+  try {
+    leanbility_update($creds['user_id'], $form_state['values']['leanbility']);
+  } catch (Exception $e) {
+    form_set_error('leanbility', t('Leanbility error (' . $e->getCode() . '): ' . $e->getMessage()));
+  }
+}
